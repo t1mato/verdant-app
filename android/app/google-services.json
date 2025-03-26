@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "847134232688",
+    "project_id": "verdant-app-105c7",
+    "storage_bucket": "verdant-app-105c7.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:847134232688:android:c346f83b97a46ea6c1a4b5",
+        "android_client_info": {
+          "package_name": "com.example.flutter_application_1"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAaIqs7oYW9mNoZwh4JpruGw-BRpvN3EdU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
