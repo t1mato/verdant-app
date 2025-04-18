@@ -7,6 +7,7 @@ import 'summary.dart';
 import 'report.dart';
 import 'signup_page.dart';
 import 'login_page.dart';
+import 'settings_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -28,6 +29,10 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       home: const AuthWrapper(),
+      routes: {
+        '/settings': (context) => const SettingsPage(),
+        '/login': (context) => const AuthWrapper(),
+      },
     );
   }
 }
@@ -58,8 +63,8 @@ class _AuthWrapperState extends State<AuthWrapper> {
             return const MainScreen();
           } else {
             return showLogin
-                ? LoginPage(toggleScreen: toggleScreen)
-                : SignupPage(toggleScreen: toggleScreen);
+              ? LoginPage(toggleScreen: toggleScreen)
+              : SignupPage(toggleScreen: toggleScreen);
           }
         }
         return const Scaffold(
@@ -84,6 +89,7 @@ class _MainScreenState extends State<MainScreen> {
     DashboardPage(),
     SummaryPage(),
     ReportPage(),
+    SettingsPage(),
   ];
 
   void _onItemTapped(int index) {
@@ -99,6 +105,8 @@ class _MainScreenState extends State<MainScreen> {
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
+        selectedItemColor: Colors.lightGreen,
+        unselectedItemColor: Colors.green,
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.dashboard),
@@ -112,6 +120,10 @@ class _MainScreenState extends State<MainScreen> {
             icon: Icon(Icons.bar_chart),
             label: "Report",
           ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.settings),
+            label: "Settings",
+          )
         ],
       ),
     );
