@@ -2,35 +2,71 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_application_1/firebase_options.dart';
-import 'dashboard.dart';
-import 'summary.dart';
-import 'report.dart';
-import 'signup_page.dart';
-import 'login_page.dart';
-import 'settings_page.dart';
+import 'package:provider/provider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
+// Import services
+import 'services/auth_service.dart';
+import 'services/database_service.dart';
+
+// Import providers
+import 'providers/theme_provider.dart';
+
+// Import pages
+import 'pages/login_page.dart';
+import 'pages/signup_page.dart';
+import 'pages/dashboard_page.dart';
+import 'pages/summary_page.dart';
+import 'pages/report_page.dart';
+import 'pages/settings_page.dart';
+
+// Entry point with Firebase initialization
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  runApp(const MyApp());
+
+  await FirebaseAuth.instance.authStateChanges().first;
+
+  FirebaseFirestore.instance.settings = const Settings(
+    persistenceEnabled: true,
+    cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED,
+  );
+
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => ThemeProvider()),
+        Provider(create: (_) => AuthService()),
+        ProxyProvider<AuthService, DatabaseService>(
+          update: (_, authService, __) => DatabaseService(
+            uid: authService.currentUser?.uid,
+          ),
+        ),
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  const MyApp({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
     return MaterialApp(
-      title: 'Finance Tracker',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
-        useMaterial3: true,
-      ),
+      title: 'Verdant Finance Tracker',
+      theme: themeProvider.getTheme(),
+      debugShowCheckedModeBanner: false,
       home: const AuthWrapper(),
       routes: {
+        '/dashboard': (context) => const DashboardPage(),
+        '/reports': (context) => const ReportPage(),
         '/settings': (context) => const SettingsPage(),
+        '/summary': (context) => const SummaryPage(),
         '/login': (context) => const AuthWrapper(),
       },
     );
@@ -41,7 +77,7 @@ class AuthWrapper extends StatefulWidget {
   const AuthWrapper({super.key});
 
   @override
-  _AuthWrapperState createState() => _AuthWrapperState();
+  State<AuthWrapper> createState() => _AuthWrapperState();
 }
 
 class _AuthWrapperState extends State<AuthWrapper> {
@@ -55,21 +91,29 @@ class _AuthWrapperState extends State<AuthWrapper> {
 
   @override
   Widget build(BuildContext context) {
+    final authService = Provider.of<AuthService>(context);
+
     return StreamBuilder<User?>(
-      stream: FirebaseAuth.instance.authStateChanges(),
+      stream: authService.authStateChanges,
       builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.active) {
-          if (snapshot.hasData) {
-            return const MainScreen();
-          } else {
-            return showLogin
-              ? LoginPage(toggleScreen: toggleScreen)
-              : SignupPage(toggleScreen: toggleScreen);
-          }
+        // Show loading indicator while connection state is initializing
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Scaffold(
+            body: Center(
+              child: CircularProgressIndicator(),
+            ),
+          );
         }
-        return const Scaffold(
-          body: Center(child: CircularProgressIndicator()),
-        );
+
+        // If user is authenticated, show main screen
+        if (snapshot.hasData) {
+          return const MainScreen();
+        }
+
+        // If user is not authenticated, show login or signup
+        return showLogin
+            ? LoginPage(toggleScreen: toggleScreen)
+            : SignupPage(toggleScreen: toggleScreen);
       },
     );
   }
@@ -79,17 +123,25 @@ class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
 
   @override
-  _MainScreenState createState() => _MainScreenState();
+  State<MainScreen> createState() => _MainScreenState();
 }
 
 class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0;
 
-  final List<Widget> _pages = const [
+  // Using a static list to avoid recreating widgets
+  static const List<Widget> _pages = [
     DashboardPage(),
     SummaryPage(),
     ReportPage(),
     SettingsPage(),
+  ];
+
+  static const List<String> _pageTitles = [
+    'Dashboard',
+    'Summary',
+    'Reports',
+    'Settings',
   ];
 
   void _onItemTapped(int index) {
@@ -101,12 +153,14 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _pages[_selectedIndex],
+      body: IndexedStack(
+        index: _selectedIndex,
+        children: _pages,
+      ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
-        selectedItemColor: Colors.lightGreen,
-        unselectedItemColor: Colors.green,
+        type: BottomNavigationBarType.fixed,
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.dashboard),
@@ -118,7 +172,7 @@ class _MainScreenState extends State<MainScreen> {
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.bar_chart),
-            label: "Report",
+            label: "Reports",
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.settings),
@@ -129,7 +183,3 @@ class _MainScreenState extends State<MainScreen> {
     );
   }
 }
-
-
-
-

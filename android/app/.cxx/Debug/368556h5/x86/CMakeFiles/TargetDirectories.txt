@@ -1,0 +1,2 @@
+/Users/timato/Documents/CS4750/flutter_application_1/android/app/.cxx/Debug/368556h5/x86/CMakeFiles/edit_cache.dir
+/Users/timato/Documents/CS4750/flutter_application_1/android/app/.cxx/Debug/368556h5/x86/CMakeFiles/rebuild_cache.dir
