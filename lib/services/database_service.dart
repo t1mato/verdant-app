@@ -102,15 +102,34 @@ class DatabaseService {
 
       debugPrint('Updating budget for user $userId: $amount, isMonthly: $isMonthly');
 
-      // Ensure the document exists first
-      await ensureUserDocumentExists();
+      // Add a retry mechanism to ensure authentication is complete
+      int retryCount = 0;
+      const maxRetries = 3;
 
-      await usersCollection.doc(userId).set({
-        'totalBudget': amount,
-        'isMonthly': isMonthly,
-      }, SetOptions(merge: true));
+      while (retryCount < maxRetries) {
+        try {
+          // Ensure the document exists first
+          await ensureUserDocumentExists();
 
-      debugPrint('Budget update successful');
+          await usersCollection.doc(userId).set({
+            'totalBudget': amount,
+            'isMonthly': isMonthly,
+          }, SetOptions(merge: true));
+
+          debugPrint('Budget update successful');
+          return; // Exit the method if successful
+        } catch (e) {
+          retryCount++;
+          debugPrint('Attempt $retryCount failed: $e');
+
+          if (retryCount >= maxRetries) {
+            rethrow; // Re-throw the error after max retries
+          }
+
+          // Wait before retrying
+          await Future.delayed(Duration(seconds: 1));
+        }
+      }
     } catch (e) {
       debugPrint('Error updating budget: $e');
       rethrow;

@@ -23,6 +23,44 @@
           "other_platform_oauth_client": []
         }
       }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:847134232688:android:e5574b24685b6572c1a4b5",
+        "android_client_info": {
+          "package_name": "com.timleecpp.verdant"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAaIqs7oYW9mNoZwh4JpruGw-BRpvN3EdU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:847134232688:android:7234662901cb36cec1a4b5",
+        "android_client_info": {
+          "package_name": "com.timleecpp.verdant"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAaIqs7oYW9mNoZwh4JpruGw-BRpvN3EdU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
     }
   ],
   "configuration_version": "1"

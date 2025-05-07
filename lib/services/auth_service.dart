@@ -132,16 +132,25 @@ class AuthService {
   }
 
   // Initialize user document with default settings
+  // Update in AuthService._createUserDocument
   Future<void> _createUserDocument(String uid, String username, String email) async {
     try {
+      // Add a delay to ensure auth state is fully established
+      await Future.delayed(Duration(milliseconds: 500));
+
       await _firestore.collection('users').doc(uid).set({
         'username': username.trim(),
         'email': email.trim(),
         'createdAt': FieldValue.serverTimestamp(),
-        'totalBudget': 1000.0, // Default budget
         'isMonthly': true, // Default to monthly budget
         'darkMode': false, // Default to light mode
       });
+
+      // Verify document was written successfully
+      final docSnapshot = await _firestore.collection('users').doc(uid).get();
+      if (!docSnapshot.exists) {
+        debugPrint('Warning: User document not created successfully');
+      }
     } catch (e) {
       debugPrint('Error creating user document: $e');
       // Don't rethrow - we don't want account creation to fail if this fails
