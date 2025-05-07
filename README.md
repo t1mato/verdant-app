@@ -2,6 +2,8 @@
 
 *Smart budget tracking that helps you grow your wealth, one cent at a time.*
 
+[![Get it on Google Play](https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png)](https://play.google.com/store/apps/details?id=com.timleecpp.verdant)
+
 ## Overview
 
 Verdant is a sleek budget tracker built with Flutter and Firebase that helps you manage finances effortlessly. Set monthly or custom budgets, categorize expenses with a tap, and gain insights through intuitive visualizations.
